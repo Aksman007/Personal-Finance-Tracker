@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  picture      String?
+  googleId     String   @unique
+  accessToken  String
+  refreshToken String
+  tokenExpiry  DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  driveConfigs DriveConfig[]
+  transactions Transaction[]
+
+  @@map("users")
+}
+
+model DriveConfig {
+  id          String    @id @default(cuid())
+  userId      String
+  folderId    String
+  folderName  String
+  lastSyncAt  DateTime?
+  syncEnabled Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  processedFiles ProcessedFile[]
+
+  @@unique([userId, folderId])
+  @@map("drive_configs")
+}
+
+model ProcessedFile {
+  id            String     @id @default(cuid())
+  driveConfigId String
+  driveFileId   String
+  fileName      String
+  mimeType      String
+  fileHash      String?
+  status        FileStatus @default(PENDING)
+  errorMessage  String?
+  processedAt   DateTime?
+  createdAt     DateTime   @default(now())
+
+  driveConfig  DriveConfig   @relation(fields: [driveConfigId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@unique([driveConfigId, driveFileId])
+  @@map("processed_files")
+}
+
+enum FileStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  SKIPPED
+}
+
+model Transaction {
+  id          String          @id @default(cuid())
+  userId      String
+  fileId      String?
+  date        DateTime
+  description String
+  amount      Decimal         @db.Decimal(12, 2)
+  type        TransactionType
+  categoryId  String?
+  rawText     String?
+  confidence  Float?
+  source      String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  file     ProcessedFile? @relation(fields: [fileId], references: [id], onDelete: SetNull)
+  category Category?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([userId, date])
+  @@index([userId, type])
+  @@index([userId, categoryId])
+  @@map("transactions")
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+model Category {
+  id        String          @id @default(cuid())
+  name      String          @unique
+  type      TransactionType
+  icon      String?
+  color     String?
+  isDefault Boolean         @default(false)
+
+  transactions Transaction[]
+
+  @@map("categories")
+}
