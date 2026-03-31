@@ -8,11 +8,11 @@ export class ImageParser implements FileParser {
   }
 
   async parse(
-    buffer: Buffer,
-    fileName: string,
+    _buffer: Buffer,
+    _fileName: string,
   ): Promise<ParsedTransaction[]> {
     // TODO: Tesseract.js OCR extraction
     // TODO: Apply same pattern matching as PDF text
-    return [];
+    return await Promise.resolve([]);
   }
 }

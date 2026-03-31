@@ -8,13 +8,13 @@ export class PdfParser implements FileParser {
   }
 
   async parse(
-    buffer: Buffer,
-    fileName: string,
+    _buffer: Buffer,
+    _fileName: string,
   ): Promise<ParsedTransaction[]> {
     // TODO: Implement pdf-parse text extraction
     // TODO: Bank statement pattern matching
     // TODO: Payslip pattern matching
     // TODO: Tesseract.js fallback for scanned PDFs
-    return [];
+    return await Promise.resolve([]);
   }
 }

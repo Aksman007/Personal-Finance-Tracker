@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import type { ParsedTransaction } from '../parsers/parser.interface.js';
 
 @Injectable()
 export class TransactionExtractor {
@@ -9,7 +8,7 @@ export class TransactionExtractor {
   // TODO: Type inference (income vs expense)
 
   normalizeAmount(raw: string): number {
-    const cleaned = raw.replace(/[^0-9.\-]/g, '');
+    const cleaned = raw.replace(/[^0-9.-]/g, '');
     return parseFloat(cleaned) || 0;
   }
 

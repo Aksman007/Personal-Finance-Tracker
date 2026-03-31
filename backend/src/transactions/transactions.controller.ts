@@ -3,9 +3,7 @@ import { TransactionsService } from './transactions.service.js';
 
 @Controller('transactions')
 export class TransactionsController {
-  constructor(
-    private readonly transactionsService: TransactionsService,
-  ) {}
+  constructor(private readonly transactionsService: TransactionsService) {}
 
   // GET /api/transactions — list (paginated, filtered)
   // GET /api/transactions/:id — get one

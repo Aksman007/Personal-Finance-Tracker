@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -16,10 +17,13 @@ export function Header() {
           <>
             <div className="flex items-center gap-2">
               {user.picture && (
-                <img
+                <Image
                   src={user.picture}
                   alt={user.name || ""}
+                  width={32}
+                  height={32}
                   className="h-8 w-8 rounded-full"
+                  unoptimized
                 />
               )}
               <span className="text-sm font-medium text-gray-700">

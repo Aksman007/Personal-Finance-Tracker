@@ -8,12 +8,12 @@ export class CsvParser implements FileParser {
   }
 
   async parse(
-    buffer: Buffer,
-    fileName: string,
+    _buffer: Buffer,
+    _fileName: string,
   ): Promise<ParsedTransaction[]> {
     // TODO: Implement csv-parser with auto-detect delimiter
     // TODO: Column mapping heuristics
     // TODO: Date/amount normalization
-    return [];
+    return await Promise.resolve([]);
   }
 }
