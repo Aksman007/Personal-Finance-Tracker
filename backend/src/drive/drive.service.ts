@@ -51,13 +51,13 @@ export class DriveService {
       refresh_token: refreshToken,
     });
 
-    // Auto-refresh expired tokens and save back to DB
+    // Auto-refresh expired tokens and persist encrypted new token
     oauth2Client.on('tokens', (tokens) => {
       if (tokens.access_token) {
         void this.prisma.user.update({
           where: { id: userId },
           data: {
-            accessToken: this.authService.getDecryptedGoogleToken(
+            accessToken: this.authService.getEncryptedGoogleToken(
               tokens.access_token,
             ),
             tokenExpiry: tokens.expiry_date

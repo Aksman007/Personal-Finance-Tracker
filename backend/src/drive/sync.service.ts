@@ -14,6 +14,42 @@ export class SyncService {
     @InjectQueue('file-processing') private readonly fileQueue: Queue,
   ) {}
 
+  /**
+   * Sync all users who have enabled drive configs.
+   * Called by the scheduled cron job.
+   */
+  async syncAllUsers() {
+    const usersWithConfigs = await this.prisma.driveConfig.findMany({
+      where: { syncEnabled: true },
+      select: { userId: true },
+      distinct: ['userId'],
+    });
+
+    let totalFiles = 0;
+    let errors = 0;
+
+    for (const { userId } of usersWithConfigs) {
+      try {
+        const result = await this.syncAllConfigs(userId);
+        totalFiles += result.newFilesQueued;
+      } catch (error) {
+        errors++;
+        this.logger.error(
+          `Sync failed for user ${userId}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        );
+      }
+    }
+
+    this.logger.log(
+      `Scheduled sync complete: ${usersWithConfigs.length} users, ${totalFiles} files queued, ${errors} errors`,
+    );
+    return {
+      usersSynced: usersWithConfigs.length - errors,
+      totalFilesQueued: totalFiles,
+      errors,
+    };
+  }
+
   async syncAllConfigs(userId: string) {
     const configs = await this.prisma.driveConfig.findMany({
       where: { userId, syncEnabled: true },

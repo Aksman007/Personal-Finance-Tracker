@@ -115,4 +115,8 @@ export class AuthService {
   getDecryptedGoogleToken(encryptedToken: string): string {
     return decrypt(encryptedToken);
   }
+
+  getEncryptedGoogleToken(plainToken: string): string {
+    return encrypt(plainToken);
+  }
 }
