@@ -1,4 +1,7 @@
 import { Module } from '@nestjs/common';
+import { BullModule } from '@nestjs/bullmq';
+import { AuthModule } from '../auth/auth.module.js';
+import { DriveModule } from '../drive/drive.module.js';
 import { QueueProcessor } from './queue.processor.js';
 import { PdfParser } from './parsers/pdf.parser.js';
 import { CsvParser } from './parsers/csv.parser.js';
@@ -8,6 +11,11 @@ import { RuleCategorizer } from './categorizer/rule.categorizer.js';
 import { AiCategorizer } from './categorizer/ai.categorizer.js';
 
 @Module({
+  imports: [
+    BullModule.registerQueue({ name: 'file-processing' }),
+    AuthModule,
+    DriveModule,
+  ],
   providers: [
     QueueProcessor,
     PdfParser,
